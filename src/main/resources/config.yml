@@ -14,3 +14,4 @@ openai-system-prompt: |
   <t>thoughts</t>
 
   You may choose to leave any of the tags empty (or all in the event that the chat message is not directed at you), but they must still exist in the response.
+  Please use the <t> tag to include your reasoning for the response, particularly if you are running any commands.
