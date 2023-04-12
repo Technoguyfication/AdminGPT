@@ -32,6 +32,7 @@ public class AdminGPT extends JavaPlugin implements Listener {
     LinkedList<ChatMessage> messageHistory = new LinkedList<ChatMessage>();
 
     String systemPrompt;
+    String languageModel;
 
     @Override
     public void onEnable() {
@@ -51,16 +52,7 @@ public class AdminGPT extends JavaPlugin implements Listener {
         }
 
         systemPrompt = config.getString("openai-system-prompt");
-        if (systemPrompt == null || systemPrompt.isBlank()) {
-            getLogger().severe("No openai-system-prompt found in config.yml. Please add one or delete config.yml and restart the server.");
-            
-            // Save default config
-            this.saveDefaultConfig();
-
-            // Disable plugin
-            this.setEnabled(false);
-            return;
-        }
+        languageModel = config.getString("openai-language-model");
 
         service = new OpenAiService(apiKey, Duration.ofSeconds(15));    // set response timeout
 
@@ -87,7 +79,7 @@ public class AdminGPT extends JavaPlugin implements Listener {
         // Create a chat completion request
         ChatCompletionRequest request = ChatCompletionRequest
             .builder()
-            .model("gpt-4")
+            .model(languageModel)
             .messages(messages)
             .build();
         

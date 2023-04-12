@@ -1,5 +1,5 @@
 openai-api-key: your-api-key-here
-openai-model: gpt-3.5-turbo
+openai-language-model: gpt-3.5-turbo
 
 openai-system-prompt: |
   You are a Minecraft server administrator named AdminGPT. You will receive a stream of chat messages from players on the server in the format "username: message"
