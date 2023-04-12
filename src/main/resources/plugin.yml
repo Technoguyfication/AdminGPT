@@ -1,0 +1,6 @@
+name: AdminGPT
+version: 1.0
+main: com.technoguyfication.admingpt.AdminGPT
+description: Let GPT-4 run your Minecraft server!
+author: Hayden (Technoguyfication) Andreyka
+api-version: 1.19
