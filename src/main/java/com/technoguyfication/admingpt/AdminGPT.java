@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nullable;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -26,7 +24,7 @@ import com.theokanning.openai.service.OpenAiService;
 public class AdminGPT extends JavaPlugin implements Listener {
 
     final int MAX_MESSAGES = 10;
-    Pattern responsePattern = Pattern.compile("<([ctp])>(.*)<\\/[ctp]>");
+    Pattern responsePattern = Pattern.compile("<([ctp])>\\/?(.*)<\\/[ctp]>");
     
     OpenAiService service;
     LinkedList<ChatMessage> messageHistory = new LinkedList<ChatMessage>();
