@@ -109,9 +109,8 @@ public class AdminGPT extends JavaPlugin implements Listener {
 
             getLogger().fine("Received chat completion result from OpenAI.");
 
-            String command = null;
-            String thoughts = null;
-            String response = null;
+            List<String> commands = new LinkedList<String>();
+            List<String> responses = new LinkedList<String>();
 
             // Run regex on each line of the result
             for (String line : responseMessage.getContent().split("\\r?\\n")) {
@@ -119,16 +118,18 @@ public class AdminGPT extends JavaPlugin implements Listener {
                 if (matcher.find()) {
                     switch (matcher.group(1)) {
                         case "c":
-                            command = matcher.group(2);
+                            String command = matcher.group(2);
                             getLogger().info(String.format("Command: %s", command));
+                            commands.add(command);
                             break;
                         case "t":
-                            thoughts = matcher.group(2);
-                            getLogger().info(String.format("Thoughts: %s", thoughts));
+                            String thought = matcher.group(2);
+                            getLogger().info(String.format("Thought: %s", thought));
                             break;
                         case "p":
-                            response = matcher.group(2);
+                            String response = matcher.group(2);
                             getLogger().info(String.format("Response: %s", response));
+                            responses.add(response);
                             break;
                         default:
                             getLogger().warning(String.format("Invalid response pattern: %s", line));
@@ -137,23 +138,20 @@ public class AdminGPT extends JavaPlugin implements Listener {
                 }
             }
 
-            final String finalCommand = command;
-            final String finalResponse = response;
-
             // Run the rest of the code on the main thread
             Bukkit.getScheduler().runTask(this, () -> {
 
                 // add the result to the list of messages
                 addChatMessage(responseMessage);
 
-                // Run the command
-                if (finalCommand != null && !finalCommand.isBlank()) {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCommand);
+                // Run the commands
+                for (String command : commands) {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
                 }
 
-                // Broadcast the response
-                if (finalResponse != null && !finalResponse.isBlank()) {
-                    Bukkit.broadcastMessage(ChatColor.AQUA + String.format("<AdminGPT> %s", finalResponse));   
+                // Broadcast response lines
+                for (String response : responses) {
+                    Bukkit.broadcastMessage(ChatColor.AQUA + String.format("<AdminGPT> %s", response));
                 }
             });
         });
