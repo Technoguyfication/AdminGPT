@@ -32,7 +32,6 @@ import com.theokanning.openai.service.OpenAiService;
 
 public class AdminGPT extends JavaPlugin implements Listener {
 
-    final int MAX_MESSAGES = 10;
     Pattern responsePattern = Pattern.compile("<([ctp])>\\/?(.*)<\\/[ctp]>");
     
     OpenAiService service;
@@ -40,6 +39,8 @@ public class AdminGPT extends JavaPlugin implements Listener {
 
     String systemPrompt;
     String languageModel;
+    int historyLength;
+
 
     // metrics
     int totalMessages = 0;
@@ -85,6 +86,7 @@ public class AdminGPT extends JavaPlugin implements Listener {
         }
 
         languageModel = config.getString("openai-language-model");
+        historyLength = config.getInt("history-length");
 
         // Add bStats charts
         metrics.addCustomChart(new SimplePie("language-model", () -> languageModel));
@@ -191,7 +193,7 @@ public class AdminGPT extends JavaPlugin implements Listener {
 
     private void addChatMessage(ChatMessage message) {
         // Remove oldest message if list is full
-        if (messageHistory.size() >= MAX_MESSAGES) {
+        if (messageHistory.size() >= historyLength) {
             messageHistory.removeFirst();
         }
 

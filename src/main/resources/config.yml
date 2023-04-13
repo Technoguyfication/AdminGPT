@@ -1,2 +1,6 @@
 openai-api-key: your-api-key-here
 openai-language-model: gpt-3.5-turbo
+
+# How many messages to include in the context
+# Increasing this number will increase token count, meaning it will cost more and take longer to generate a response
+history-length: 10
