@@ -40,6 +40,7 @@ public class AdminGPT extends JavaPlugin implements Listener {
     String systemPrompt;
     String languageModel;
     int historyLength;
+    long timeoutSeconds;
 
 
     // metrics
@@ -86,6 +87,7 @@ public class AdminGPT extends JavaPlugin implements Listener {
         }
 
         languageModel = config.getString("openai-language-model");
+        timeoutSeconds = config.getLong("openai-timeout-secs");
         historyLength = config.getInt("history-length");
 
         // Add bStats charts
@@ -106,7 +108,7 @@ public class AdminGPT extends JavaPlugin implements Listener {
         }));
 
         // Create OpenAI service
-        service = new OpenAiService(apiKey, Duration.ofSeconds(15));    // set response timeout
+        service = new OpenAiService(apiKey, Duration.ofSeconds(timeoutSeconds));    // set response timeout
 
         // Register event listeners
         getServer().getPluginManager().registerEvents(this, this);
