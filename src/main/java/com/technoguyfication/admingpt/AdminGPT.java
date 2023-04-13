@@ -78,7 +78,7 @@ public class AdminGPT extends JavaPlugin implements Listener {
 
         // Load config
         String apiKey = config.getString("openai-api-key");
-        if (apiKey == null || apiKey.isBlank()) {
+        if (apiKey == null || apiKey.isBlank() || apiKey.equals("your-api-key-here")) {
             getLogger().severe("No OpenAI API key found in config.yml. Please add one and restart the server.");
             
             // Save default config
