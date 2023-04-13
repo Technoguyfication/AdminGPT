@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
@@ -133,9 +134,15 @@ public class AdminGPT extends JavaPlugin implements Listener {
         // Add new message to list
         addChatMessage(new ChatMessage(ChatMessageRole.USER.value(), String.format("%s: %s", event.getPlayer().getName(), event.getMessage())));
 
+        // Replace placeholders in the system prompt
+        String templatedSystemPrompt = systemPrompt
+            .replace("{plugins}", String.join(", ", Stream.of(Bukkit.getPluginManager().getPlugins()).map(p -> p.getName()).toArray(String[]::new)))    
+            .replace("{players}", String.join(", ", Bukkit.getOnlinePlayers().stream().map(p -> p.getName()).toArray(String[]::new)))
+            .replace("{version}", Bukkit.getVersion());
+
         // Make a new list with the system prompt and all messages
         List<ChatMessage> messages = new LinkedList<ChatMessage>();
-        messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), systemPrompt));
+        messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), templatedSystemPrompt));
         messages.addAll(messageHistory);
 
         // Create a chat completion request
