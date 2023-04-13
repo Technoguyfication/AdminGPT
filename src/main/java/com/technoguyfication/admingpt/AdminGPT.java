@@ -127,6 +127,9 @@ public class AdminGPT extends JavaPlugin implements Listener {
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) throws EventException {
 
+        // Increment total messages counter
+        totalMessages++;
+
         // Add new message to list
         addChatMessage(new ChatMessage(ChatMessageRole.USER.value(), String.format("%s: %s", event.getPlayer().getName(), event.getMessage())));
 
@@ -181,6 +184,10 @@ public class AdminGPT extends JavaPlugin implements Listener {
 
             // Run the rest of the code on the main thread
             Bukkit.getScheduler().runTask(this, () -> {
+
+                // Add commands and responses to total counters
+                totalCommands += commands.size();
+                totalResponses += responses.size();
 
                 // add the result to the list of messages
                 addChatMessage(responseMessage);
