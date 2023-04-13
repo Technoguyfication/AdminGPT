@@ -1,5 +1,7 @@
 package com.technoguyfication.admingpt;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,6 +11,7 @@ import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventException;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,6 +38,23 @@ public class AdminGPT extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         FileConfiguration config = this.getConfig();
+        InputStream langStream = this.getResource("lang.yml");
+
+        // Load lang.yml
+        YamlConfiguration langConfig = new YamlConfiguration();
+        try {
+            langConfig.load(new InputStreamReader(langStream));
+
+            // Load system prompt from lang.yml
+            systemPrompt = langConfig.getString("openai-system-prompt");
+        } catch (Exception e) {
+            getLogger().severe("Failed to load lang.yml file.");
+            e.printStackTrace();
+
+            // Disable plugin
+            this.setEnabled(false);
+            return;
+        }
 
         // Load config
         String apiKey = config.getString("openai-api-key");
