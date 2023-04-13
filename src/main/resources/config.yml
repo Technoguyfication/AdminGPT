@@ -1,5 +1,12 @@
 openai-api-key: your-api-key-here
+
+# https://platform.openai.com/docs/models
 openai-language-model: gpt-3.5-turbo
+
+# https://platform.openai.com/docs/api-reference/completions/create#completions/create-temperature
+openai-model-temperature: 0.5
+
+# How long to wait for a response from OpenAI before giving up
 openai-timeout-secs: 20
 
 # How many messages to include in the context

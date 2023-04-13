@@ -42,6 +42,7 @@ public class AdminGPT extends JavaPlugin implements Listener {
     String languageModel;
     int historyLength;
     long timeoutSeconds;
+    Double temperature;
     List<String> commandBlacklist;
 
 
@@ -89,6 +90,7 @@ public class AdminGPT extends JavaPlugin implements Listener {
         }
 
         languageModel = config.getString("openai-language-model");
+        temperature = config.getDouble("openai-model-temperature");
         timeoutSeconds = config.getLong("openai-timeout-secs");
         historyLength = config.getInt("history-length");
         commandBlacklist = config.getStringList("command-blacklist");
@@ -151,6 +153,7 @@ public class AdminGPT extends JavaPlugin implements Listener {
             .model(languageModel)
             .messages(messages)
             .user(event.getPlayer().getUniqueId().toString())
+            .temperature(temperature)
             .build();
         
         getLogger().fine("Sending chat completion request to OpenAI...");
