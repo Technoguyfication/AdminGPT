@@ -41,6 +41,7 @@ public class AdminGPT extends JavaPlugin implements Listener {
     String languageModel;
     int historyLength;
     long timeoutSeconds;
+    List<String> commandBlacklist;
 
 
     // metrics
@@ -89,6 +90,7 @@ public class AdminGPT extends JavaPlugin implements Listener {
         languageModel = config.getString("openai-language-model");
         timeoutSeconds = config.getLong("openai-timeout-secs");
         historyLength = config.getInt("history-length");
+        commandBlacklist = config.getStringList("command-blacklist");
 
         // Add bStats charts
         metrics.addCustomChart(new SimplePie("language-model", () -> languageModel));
@@ -112,6 +114,9 @@ public class AdminGPT extends JavaPlugin implements Listener {
 
         // Register event listeners
         getServer().getPluginManager().registerEvents(this, this);
+
+        // Startup messages
+        getLogger().info("Command blacklist: " + String.join(", ", commandBlacklist));
     }
 
     @Override
@@ -182,6 +187,13 @@ public class AdminGPT extends JavaPlugin implements Listener {
 
                 // Run the commands
                 for (String command : commands) {
+                    // Check if command is blacklisted
+                    String rootCommand = command.split(" ")[0];
+                    if (commandBlacklist.contains(rootCommand.toLowerCase())) {
+                        getLogger().warning(String.format("Command %s is blacklisted.", command));
+                        continue;
+                    }
+
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
                 }
 

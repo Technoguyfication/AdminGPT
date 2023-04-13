@@ -5,3 +5,20 @@ openai-timeout-secs: 20
 # How many messages to include in the context
 # Increasing this number will increase token count, meaning it will cost more and take longer to generate a response
 history-length: 10
+
+# Dangerous commands that should not be allowed to be executed by the AI
+# These must all be lowercase
+command-blacklist:
+  - stop
+  - ban
+  - kick
+  - whitelist
+  - op
+  - deop
+  - pardon
+  - pardon-ip
+  - reload
+  - save-all
+  - save-off
+  - save-on
+  - gamemode
