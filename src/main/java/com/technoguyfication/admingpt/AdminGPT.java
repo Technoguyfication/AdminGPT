@@ -3,18 +3,15 @@ package com.technoguyfication.admingpt;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
-import org.bstats.charts.MultiLineChart;
+import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -34,7 +31,7 @@ import com.theokanning.openai.service.OpenAiService;
 public class AdminGPT extends JavaPlugin implements Listener {
 
     Pattern responsePattern = Pattern.compile("<([ctp])>\\/?(.*)<\\/[ctp]>");
-    
+
     OpenAiService service;
     LinkedList<ChatMessage> messageHistory = new LinkedList<ChatMessage>();
 
@@ -44,7 +41,6 @@ public class AdminGPT extends JavaPlugin implements Listener {
     long timeoutSeconds;
     Double temperature;
     List<String> commandBlacklist;
-
 
     // metrics
     int totalMessages = 0;
@@ -80,7 +76,7 @@ public class AdminGPT extends JavaPlugin implements Listener {
         String apiKey = config.getString("openai-api-key");
         if (apiKey == null || apiKey.isBlank() || apiKey.equals("your-api-key-here")) {
             getLogger().severe("No OpenAI API key found in config.yml. Please add one and restart the server.");
-            
+
             // Save default config
             this.saveDefaultConfig();
 
@@ -97,23 +93,30 @@ public class AdminGPT extends JavaPlugin implements Listener {
 
         // Add bStats charts
         metrics.addCustomChart(new SimplePie("language-model", () -> languageModel));
-        metrics.addCustomChart(new MultiLineChart("messages", new Callable<Map<String, Integer>>() {
-            @Override
-            public Map<String, Integer> call() {
-                Map<String, Integer> valueMap = new HashMap<>();
-                valueMap.put("total", totalMessages);
-                valueMap.put("commands", totalCommands);
-                valueMap.put("responses", totalResponses);
+        metrics.addCustomChart(new SingleLineChart("messages-sent", () -> {
 
-                // reset counters
-                totalMessages = totalCommands = totalResponses = 0;
+            var total = totalMessages;
+            totalMessages = 0;
 
-                return valueMap;
-            }
+            return total;
+        }));
+        metrics.addCustomChart(new SingleLineChart("commands-run", () -> {
+
+            var total = totalCommands;
+            totalCommands = 0;
+
+            return total;
+        }));
+        metrics.addCustomChart(new SingleLineChart("responses-received", () -> {
+
+            var total = totalResponses;
+            totalResponses = 0;
+
+            return total;
         }));
 
         // Create OpenAI service
-        service = new OpenAiService(apiKey, Duration.ofSeconds(timeoutSeconds));    // set response timeout
+        service = new OpenAiService(apiKey, Duration.ofSeconds(timeoutSeconds)); // set response timeout
 
         // Register event listeners
         getServer().getPluginManager().registerEvents(this, this);
@@ -134,13 +137,19 @@ public class AdminGPT extends JavaPlugin implements Listener {
         totalMessages++;
 
         // Add new message to list
-        addChatMessage(new ChatMessage(ChatMessageRole.USER.value(), String.format("%s: %s", event.getPlayer().getName(), event.getMessage())));
+        addChatMessage(new ChatMessage(ChatMessageRole.USER.value(),
+                String.format("%s: %s", event.getPlayer().getName(), event.getMessage())));
 
         // Replace placeholders in the system prompt
         String templatedSystemPrompt = systemPrompt
-            .replace("{plugins}", String.join(", ", Stream.of(Bukkit.getPluginManager().getPlugins()).map(p -> p.getName()).toArray(String[]::new)))    
-            .replace("{players}", String.join(", ", Bukkit.getOnlinePlayers().stream().map(p -> p.getName()).toArray(String[]::new)))
-            .replace("{version}", Bukkit.getVersion());
+                .replace("{plugins}",
+                        String.join(", ",
+                                Stream.of(Bukkit.getPluginManager().getPlugins()).map(p -> p.getName())
+                                        .toArray(String[]::new)))
+                .replace("{players}",
+                        String.join(", ",
+                                Bukkit.getOnlinePlayers().stream().map(p -> p.getName()).toArray(String[]::new)))
+                .replace("{version}", Bukkit.getVersion());
 
         // Make a new list with the system prompt and all messages
         List<ChatMessage> messages = new LinkedList<ChatMessage>();
@@ -149,15 +158,15 @@ public class AdminGPT extends JavaPlugin implements Listener {
 
         // Create a chat completion request
         ChatCompletionRequest request = ChatCompletionRequest
-            .builder()
-            .model(languageModel)
-            .messages(messages)
-            .user(event.getPlayer().getUniqueId().toString())
-            .temperature(temperature)
-            .build();
-        
+                .builder()
+                .model(languageModel)
+                .messages(messages)
+                .user(event.getPlayer().getUniqueId().toString())
+                .temperature(temperature)
+                .build();
+
         getLogger().fine("Sending chat completion request to OpenAI...");
-        
+
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
             ChatCompletionResult result = service.createChatCompletion(request);
             ChatMessage responseMessage = result.getChoices().get(0).getMessage();
