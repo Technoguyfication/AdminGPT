@@ -143,6 +143,7 @@ public class AdminGPT extends JavaPlugin implements Listener {
             .builder()
             .model(languageModel)
             .messages(messages)
+            .user(event.getPlayer().getUniqueId().toString())
             .build();
         
         getLogger().fine("Sending chat completion request to OpenAI...");
