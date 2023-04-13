@@ -17,10 +17,14 @@ dependencies {
 
     // OpenAI Java API
     implementation 'com.theokanning.openai-gpt3-java:service:0.12.0'
+
+    // bStats
+    implementation 'org.bstats:bstats-bukkit:3.0.2'
 }
 
 shadowJar {
-    relocate "com.theokanning.openai", "com.technoguyfication.admingpt.openai"
+    relocate "com.theokanning", "com.technoguyfication.admingpt"
+    relocate "org.bstats", "com.technoguyfication.admingpt"
 }
 
 jar {

@@ -3,11 +3,17 @@ package com.technoguyfication.admingpt;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
+import org.bstats.charts.MultiLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -35,8 +41,17 @@ public class AdminGPT extends JavaPlugin implements Listener {
     String systemPrompt;
     String languageModel;
 
+    // metrics
+    int totalMessages = 0;
+    int totalCommands = 0;
+    int totalResponses = 0;
+
     @Override
     public void onEnable() {
+        // bStats
+        int pluginId = 18196;
+        Metrics metrics = new Metrics(this, pluginId);
+
         FileConfiguration config = this.getConfig();
         InputStream langStream = this.getResource("lang.yml");
 
@@ -69,9 +84,26 @@ public class AdminGPT extends JavaPlugin implements Listener {
             return;
         }
 
-        systemPrompt = config.getString("openai-system-prompt");
         languageModel = config.getString("openai-language-model");
 
+        // Add bStats charts
+        metrics.addCustomChart(new SimplePie("language-model", () -> languageModel));
+        metrics.addCustomChart(new MultiLineChart("messages", new Callable<Map<String, Integer>>() {
+            @Override
+            public Map<String, Integer> call() {
+                Map<String, Integer> valueMap = new HashMap<>();
+                valueMap.put("total", totalMessages);
+                valueMap.put("commands", totalCommands);
+                valueMap.put("responses", totalResponses);
+
+                // reset counters
+                totalMessages = totalCommands = totalResponses = 0;
+
+                return valueMap;
+            }
+        }));
+
+        // Create OpenAI service
         service = new OpenAiService(apiKey, Duration.ofSeconds(15));    // set response timeout
 
         // Register event listeners
