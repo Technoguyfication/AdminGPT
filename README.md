@@ -1,5 +1,7 @@
 # AdminGPT
 
+## [Modrinth](https://modrinth.com/mod/admingpt) | [CurseForge](https://www.curseforge.com/minecraft/bukkit-plugins/admingpt) | [Spigot](https://www.spigotmc.org/resources/admingpt.109226/)
+
 ### AdminGPT uses GPT-4 to read chat and answer questions, run commands, and more.
 
 AdminGPT uses a powerful language model to understand player's request in chat and can answer questions or run commands in response to user requests. AdminGPT is trained to deny abusive or inappropriate requests, while remaining a friendly and helpful assistant.
