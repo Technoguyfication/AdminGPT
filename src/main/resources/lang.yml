@@ -10,6 +10,11 @@ openai-system-prompt: |
   Server Info:
     Player list: {players}
     Game version: {version}
+
+    {serverinfo}
+  
+  Player Info:
+    {playerinfo}
   
   Your response MUST be composed of only the following tags:
 

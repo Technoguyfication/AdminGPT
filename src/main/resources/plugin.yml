@@ -4,3 +4,13 @@ main: com.technoguyfication.admingpt.AdminGPT
 description: Let GPT-4 run your Minecraft server!
 author: Hayden (Technoguyfication) Andreyka
 api-version: 1.19
+
+commands:
+  admingpt:
+    description: Control and manage AdminGPT
+    usage: /admingpt <command> [args]
+    permissions: admingpt.admin
+  agpt:
+    description: Send a message directly and privately to AdminGPT
+    usage: /agpt <message>
+    permissions: admingpt.agpt

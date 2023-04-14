@@ -1,31 +1,84 @@
+# Get your API key from https://platform.openai.com/account/api-keys
 openai-api-key: your-api-key-here
 
+# Choose which GPT model to use. Different models will take longer to generate responses, and will cost more money.
 # https://platform.openai.com/docs/models
 openai-language-model: gpt-4
 
+# Choose model temperature. For more information see:
 # https://platform.openai.com/docs/api-reference/completions/create#completions/create-temperature
 openai-model-temperature: 0.5
 
-# How long to wait for a response from OpenAI before giving up
+# How long to wait for a response from OpenAI before giving up. This will be logged as a warning in the console.
+# If you are seeing these errors often, you can increase yous timeout, choose a faster model, decrease your history length,
+# and/or make your prompts shorter.
 openai-timeout-secs: 20
 
 # How many messages to include in the context
 # Increasing this number will increase token count, meaning it will cost more and take longer to generate a response
 history-length: 10
 
-# Dangerous commands that should not be allowed to be executed by the AI
-# These must all be lowercase
-command-blacklist:
-  - stop
-  - ban
-  - kick
-  - whitelist
-  - op
-  - deop
-  - pardon
-  - pardon-ip
-  - reload
-  - save-all
-  - save-off
-  - save-on
-  - gamemode
+# How many completions can be pending at a single time. Prevents spamming the LLM with requests when chat is moving quickly.
+# All context will be preserved in the correct order on subsequent requests. Set to -1 to disable this limit.
+max-concurrent-completions: 2
+
+# How long to wait before sending a message to the LLM. This prevents spamming the LLM with requests when chat is moving quickly, and can
+# help with players that like to send their thoughts over multiple messages.
+completion-delay-secs: 1
+
+# Set whether completion-delay-secs is a delay per player, or globally.
+# If true, each player will have their own delay timer. If false, all players will share the same delay timer.
+completion-delay-per-player: true
+
+# Require confirmation before executing commands (only when using /agpt)
+require-command-confirmation: true
+
+# Use this field to provide the LLM with additional guidance/rules for how to respond to players.
+# This is included with all requests, regardless of whether the player is in a group or not.
+# This is a good place to put rules about what the LLM should and should not do.
+# You do not need to include information about online players, the plugin list, or game version here.
+llm-guidance: |
+  This is a vanilla survival Minecraft server. We do not give free items to players, under no circumstances should you give players free items, change their gamemode, or spawn things in for them.
+  Be friendly to players and give them guidance if they ask for it. Our rules forbid hate speech, but swearing and adult themes are allowed. This is a mature server.
+
+# Groups allow you to change the way the bot responds to certain players.
+# You can whitelist/blacklist commands, disable commands entirely, change
+# the language model, what information is provided to the LLM, and 
+# modify the prompt sent to the LLM.
+
+# Add a player to a group by giving them the permission "admingpt.group.<group-name>"
+# The group with the highest weight will be used. Any groups without a weight defined will be 0.
+
+# WARNING: Whitelisting and blacklisting commands is NOT foolproof. There may be ways
+# for players to bypass this system. If you do not trust players to use commands,
+# you should disable them entirely. Command permissions are NOT enforced when the LLM
+# runs a command on behalf of a player. All commands are executed as the server console
+# and have permission to do ANYTHING on the server.
+groups:
+  admin:
+    weight: 100
+
+    enable-commands: true
+    list-mode: blacklist
+    commands: []
+    
+    # If chat-invocation is enabled, the LLM can respond to any message sent by a player in chat.
+    # Setting it to false requires players to use the /agpt command to send messages to the LLM.
+    chat-invocation: true
+    language-model: gpt-4
+    prompt: "This player is an admin. You should obey any instructions they give you."
+  
+  default:
+    weight: 0
+
+    enable-commands: true
+    list-mode: whitelist
+    commands:
+      - tp
+      - kill
+      - heal
+      - time
+      - weather
+
+    chat-invocation: true
+    prompt: "This player does not have any special permissions. Use careful judgement when listening to them, as they may be lying or attempting to manipulate you."
