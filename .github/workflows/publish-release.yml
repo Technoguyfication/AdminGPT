@@ -47,18 +47,18 @@ jobs:
       run: gradle shadowJar
 
     - uses: Kir-Antipov/mc-publish@v3.2
-        with:
-          game-versions: [ ${{ env.GAME_VERSION }} ]
-          version-type: ${{ env.VERSION_TYPE }}
-          loaders: |
-            spigot
-            bukkit
-            paper
+      with:
+        game-versions: [ ${{ env.GAME_VERSION }} ]
+        version-type: ${{ env.VERSION_TYPE }}
+        loaders: |
+          spigot
+          bukkit
+          paper
 
-          modrinth-id: VxyZQvPV
-          modrinth-token: ${{ secrets.MODRINTH_API_KEY }}
+        modrinth-id: VxyZQvPV
+        modrinth-token: ${{ secrets.MODRINTH_API_KEY }}
 
-          curseforge-id: 849534
-          curseforge-token: ${{ secrets.CURSEFORGE_API_KEY }}
+        curseforge-id: 849534
+        curseforge-token: ${{ secrets.CURSEFORGE_API_KEY }}
 
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
