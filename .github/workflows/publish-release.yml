@@ -27,12 +27,29 @@ jobs:
     - name: Build with Gradle
       run: gradle shadowJar
 
+    - name: Get Version Type
+      id: get_version_type
+      run: |
+        if [[ "${{ github.event.release.version }}" == *"alpha"* ]]; then
+          VERSION_TYPE="alpha"
+        elif [[ "${{ github.event.release.version }}" == *"beta"* ]]; then
+          VERSION_TYPE="beta"
+        else
+          VERSION_TYPE="release"
+        fi
+
+        echo "::set-output name=version_type::$VERSION_TYPE"
+
     - uses: Kir-Antipov/mc-publish@v3.2
       with:
         loaders: |
           spigot
           bukkit
           paper
+
+        game-versions: |
+          ${{ steps.get_game_version.outputs.game_version }}
+        version-resolver: exact
 
         modrinth-id: VxyZQvPV
         modrinth-token: ${{ secrets.MODRINTH_API_KEY }}
