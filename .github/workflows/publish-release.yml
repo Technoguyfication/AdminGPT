@@ -36,6 +36,7 @@ jobs:
       id: get_jar_name
       run: |
         export JAR_NAME=$(ls build/libs | grep .jar)
+        echo "Jar Name: $JAR_NAME"
 
     - name: Upload Artifact to GitHub Release
       uses: actions/upload-release-asset@v1
@@ -43,8 +44,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./build/libs/${{ env.JAR_NAME }}
-        asset_name: ${{ env.JAR_NAME }}
+        asset_path: ./build/libs/${{ steps.get_jar_name.outputs.jar_name }}
+        asset_name: ${{ steps.get_jar_name.outputs.jar_name }}
         asset_content_type: application/java-archive
 
     - name: Publish to Modrinth
