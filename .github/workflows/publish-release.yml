@@ -45,10 +45,7 @@ jobs:
 
         game-versions: |
           ${{ steps.get_game_version.outputs.game_version }}
-        version-resolver: exact
         fail-mode: skip
-
-        files-secondary: build/libs/*sha256sum.txt
 
         modrinth-id: VxyZQvPV
         modrinth-token: ${{ secrets.MODRINTH_API_KEY }}
