@@ -25,6 +25,8 @@ jobs:
       id: get_game_version
       run: |
         export GAME_VERSION=$(grep -r -oP '(?<=org\.spigotmc:spigot-api:)\d+\.\d+\.\d+' build.gradle | head -n1)
+        echo "::set-output name=game_version::$GAME_VERSION"
+        echo "Game Version: $GAME_VERSION"
 
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
@@ -65,12 +67,9 @@ jobs:
           VERSION_TYPE="release"
         fi
 
-        export JSON_PAYLOAD = "data={'name': '${{ github.event.release.name }}', 'changelog': '${{ github.event.release.body }}', 'version_number': '${{ github.event.release.tag-name }}', \
-        'version_type': '$VERSION_TYPE', 'game_versions': ['$GAME_VERSION'], 'loaders': ['spigot', 'bukkit', 'paper'], 'dependencies': []"
-        echo $JSON_PAYLOAD
-
         curl -X POST -H "Content-Type: multipart/form-data" -H "Authorization: $MODRINTH_API_KEY" \
-        -F "$JSON_PAYLOAD"\
+        -F 'data={'name': '${{ github.event.release.name }}', 'changelog': '${{ github.event.release.body }}', 'version_number': '${{ github.event.release.tag-name }}', \
+        'version_type': '$VERSION_TYPE', 'game_versions': ['${{ steps.get_game_version.outputs.game_version }}'], 'loaders': ['spigot', 'bukkit', 'paper'], 'dependencies': []'\
         -F "file=@build/libs/${{ steps.get_jar_name.outputs.jar_name }}" "https://api.modrinth.com/v2/version"
 
     # - name: Publish to CurseForge
