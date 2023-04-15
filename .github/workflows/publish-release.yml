@@ -36,6 +36,7 @@ jobs:
       id: get_jar_name
       run: |
         export JAR_NAME=$(ls build/libs | grep .jar)
+        echo "::set-output name=jar_name::$JAR_NAME"
         echo "Jar Name: $JAR_NAME"
 
     - name: Upload Artifact to GitHub Release
