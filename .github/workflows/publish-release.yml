@@ -65,7 +65,7 @@ jobs:
           VERSION_TYPE="release"
         fi
 
-        JSON_PAYLOAD = "data={'name': '${{ github.event.release.name }}', 'changelog': '${{ github.event.release.body }}', 'version_number': '${{ github.event.release.tag-name }}', \
+        export JSON_PAYLOAD = "data={'name': '${{ github.event.release.name }}', 'changelog': '${{ github.event.release.body }}', 'version_number': '${{ github.event.release.tag-name }}', \
         'version_type': '$VERSION_TYPE', 'game_versions': ['$GAME_VERSION'], 'loaders': ['spigot', 'bukkit', 'paper'], 'dependencies': []"
         echo $JSON_PAYLOAD
 
