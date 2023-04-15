@@ -26,12 +26,15 @@ jobs:
 
     - name: Build with Gradle
       run: gradle shadowJar
+    
+    - name: Generate SHA256 File
+      run: sha256sum build/libs/*.jar > build/libs/sha256sum.txt
 
     - name: Get Game Version From Gradle
       id: get_game_version
       run: |
         export GAME_VERSION=$(grep -r -oP '(?<=org\.spigotmc:spigot-api:)\d+\.\d+\.\d+' build.gradle | head -n1)
-        echo "GAME_VERSION=$GAME_VERSION" >> $GITHUB_OUTPUT
+        echo "game_version=$GAME_VERSION" >> $GITHUB_OUTPUT
 
     - uses: Kir-Antipov/mc-publish@v3.2
       with:
@@ -43,6 +46,8 @@ jobs:
         game-versions: |
           ${{ steps.get_game_version.outputs.game_version }}
         version-resolver: exact
+
+        files-secondary: build/libs/*sha256sum.txt
 
         modrinth-id: VxyZQvPV
         modrinth-token: ${{ secrets.MODRINTH_API_KEY }}
