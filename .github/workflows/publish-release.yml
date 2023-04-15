@@ -48,7 +48,8 @@ jobs:
 
     - uses: Kir-Antipov/mc-publish@v3.2
       with:
-        game-versions: [ ${{ env.GAME_VERSION }} ]
+        game-versions:
+          - ${{ env.GAME_VERSION }}
         version-type: ${{ env.VERSION_TYPE }}
         loaders: |
           spigot
