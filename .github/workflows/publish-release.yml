@@ -23,12 +23,16 @@ jobs:
 
     - name: Get Game Version From Gradle
       id: get_game_version
+      outputs:
+        game_version: ${{ env.GAME_VERSION }}
       run: |
         export GAME_VERSION=$(grep -r -oP '(?<=org\.spigotmc:spigot-api:)\d+\.\d+\.\d+' build.gradle | head -n1)
         echo "GAME_VERSION=$GAME_VERSION" >> $GITHUB_ENV
 
     - name: Get Version Type
       id: get_version_type
+      outputs:
+        version_type: ${{ env.VERSION_TYPE }}
       run: |
         if [[ "${{ github.event.release.version }}" == *"alpha"* ]]; then
           VERSION_TYPE="alpha"
@@ -47,6 +51,9 @@ jobs:
       run: gradle shadowJar
 
     - uses: Kir-Antipov/mc-publish@v3.2
+      depends-on:
+        - get_game_version
+        - get_version_type
       with:
         game-versions:
           - ${{ env.GAME_VERSION }}
