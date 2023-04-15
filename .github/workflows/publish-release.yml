@@ -48,8 +48,8 @@ jobs:
 
     - uses: Kir-Antipov/mc-publish@v3.2
       with:
-        game-versions:
-          - ${{ steps.get_game_version.outputs.game_version }}
+        game-versions: |
+          ${{ steps.get_game_version.outputs.game_version }}
         version-type: ${{ steps.get_version_type.outputs.version_type }}
         loaders: |
           spigot
