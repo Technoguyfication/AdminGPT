@@ -33,7 +33,7 @@ jobs:
     - name: Get Game Version From Gradle
       id: get_game_version
       run: |
-        export GAME_VERSION=$(grep -r -oP '(?<=org\.spigotmc:spigot-api:)\d+\.\d+\.\d+' build.gradle | head -n1)
+        export GAME_VERSION=$(grep -r -oP '(?<=org\.spigotmc:spigot-api:)\d+\.\d+\.?\d*' build.gradle | head -n1)
         echo "game_version=$GAME_VERSION" >> $GITHUB_OUTPUT
 
     - uses: Kir-Antipov/mc-publish@v3.2
