@@ -3,7 +3,7 @@ name: Build and Publish on Release
 on:
   release:
     types:
-      - [ published ]
+      - published
 
 jobs:
   build_and_publish:
