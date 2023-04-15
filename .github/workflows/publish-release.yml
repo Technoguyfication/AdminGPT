@@ -25,40 +25,11 @@ jobs:
       id: get_game_version
       run: |
         export GAME_VERSION=$(grep -r -oP '(?<=org\.spigotmc:spigot-api:)\d+\.\d+\.\d+' build.gradle | head -n1)
-        echo "::set-output name=game_version::$GAME_VERSION"
-        echo "Game Version: $GAME_VERSION"
+        echo "GAME_VERSION=$GAME_VERSION" >> $GITHUB_ENV
 
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
-
-    - name: Build with Gradle
-      run: gradle shadowJar
-
-    - name: Get Name of Jar File
-      id: get_jar_name
+    - name: Get Version Type
+      id: get_version_type
       run: |
-        export JAR_NAME=$(ls build/libs | grep .jar)
-        echo "::set-output name=jar_name::$JAR_NAME"
-        echo "Jar Name: $JAR_NAME"
-
-    - name: Upload Artifact to GitHub Release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./build/libs/${{ steps.get_jar_name.outputs.jar_name }}
-        asset_name: ${{ steps.get_jar_name.outputs.jar_name }}
-        asset_content_type: application/java-archive
-
-    - name: Publish to Modrinth
-      env:
-        MODRINTH_API_KEY: ${{ secrets.MODRINTH_API_KEY }}
-        MODRINTH_PROJECT_ID: "VxyZQvPV"
-        
-      run: |
-        shopt -s nocasematch
-        
         if [[ "${{ github.event.release.version }}" == *"alpha"* ]]; then
           VERSION_TYPE="alpha"
         elif [[ "${{ github.event.release.version }}" == *"beta"* ]]; then
@@ -67,25 +38,27 @@ jobs:
           VERSION_TYPE="release"
         fi
 
-        curl -X POST -H "Content-Type: multipart/form-data" -H "Authorization: $MODRINTH_API_KEY" \
-        -F 'data={'name': '${{ github.event.release.name }}', 'changelog': '${{ github.event.release.body }}', 'version_number': '${{ github.event.release.tag-name }}', \
-        'version_type': '$VERSION_TYPE', 'game_versions': ['${{ steps.get_game_version.outputs.game_version }}'], 'loaders': ['spigot', 'bukkit', 'paper'], 'dependencies': []'\
-        -F "file=@build/libs/${{ steps.get_jar_name.outputs.jar_name }}" "https://api.modrinth.com/v2/version"
+        echo "VERSION_TYPE=$VERSION_TYPE" >> $GITHUB_ENV
 
-    # - name: Publish to CurseForge
-    #   uses: ItsTheDodo/curseforge-publish@1.3.0
-    #   with:
-    #     projectId: <your_curseforge_project_id>
-    #     apiKey: ${{ secrets.CURSEFORGE_API_KEY }}
-    #     file: ./build/libs/your_project_output.jar
-    #     changelog: "Changelog: ${GITHUB_REF#refs/tags/}"
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
 
-    # - name: Create new version on Spigot
-    #   env:
-    #     SPIGOT_API_KEY: ${{ secrets.SPIGOT_API_KEY }}
-    #   run: |
-    #     VERSION_NAME="${GITHUB_REF#refs/tags/}"
-    #     DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/$VERSION_NAME/your_project_output.jar"
-    #     curl -X POST -H "Content-Type: application/json" -H "X-Api-Key: $SPIGOT_API_KEY" \
-    #     -d "{\"name\":\"$VERSION_NAME\",\"download\":\"$DOWNLOAD_URL\",\"tag\":\"$VERSION_NAME\",\"changelog\":\"Changelog: $VERSION_NAME\"}" \
-    #     "https://api.spigotmc.org/v2/resources/<your_spigot_resource_id>/versions"
+    - name: Build with Gradle
+      run: gradle shadowJar
+
+    - uses: Kir-Antipov/mc-publish@v3.2
+        with:
+          game-versions: [ ${{ env.GAME_VERSION }} ]
+          version-type: ${{ env.VERSION_TYPE }}
+          loaders: |
+            spigot
+            bukkit
+            paper
+
+          modrinth-id: VxyZQvPV
+          modrinth-token: ${{ secrets.MODRINTH_API_KEY }}
+
+          curseforge-id: 849534
+          curseforge-token: ${{ secrets.CURSEFORGE_API_KEY }}
+
+          github-token: ${{ secrets.GITHUB_TOKEN }}
