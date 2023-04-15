@@ -30,7 +30,7 @@ jobs:
       uses: gradle/gradle-build-action@v2
 
     - name: Build with Gradle
-      run: ./gradlew shadowJar
+      run: gradle shadowJar
 
     - name: Get Name of Jar File
       id: get_jar_name
