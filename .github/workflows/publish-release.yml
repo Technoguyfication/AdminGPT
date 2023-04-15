@@ -65,8 +65,9 @@ jobs:
           VERSION_TYPE="release"
         fi
 
-        curl -X POST -H "Content-Type: multipart/form-data" -H "Authorization: Bearer $MODRINTH_API_KEY" \
-        -F 'data={"name": "${{ github.event.release.name }}", "changelog": "${{ github.event.release.body }}", "version_number": "${{ github.event.release.tag-name }}", "version_type": "$VERSION_TYPE", "game_versions": ["$GAME_VERSION"]'\
+        curl -X POST -H "Content-Type: multipart/form-data" -H "Authorization: $MODRINTH_API_KEY" \
+        -F 'data={"name": "${{ github.event.release.name }}", "changelog": "${{ github.event.release.body }}", "version_number": "${{ github.event.release.tag-name }}", \
+        "version_type": "$VERSION_TYPE", "game_versions": ["$GAME_VERSION"], "loaders": ["spigot", "bukkit", "paper"], "dependencies": []'\
         -F "file=@build/libs/${{ steps.get_jar_name.outputs.jar_name }}" "https://api.modrinth.com/v2/version"
 
     # - name: Publish to CurseForge
