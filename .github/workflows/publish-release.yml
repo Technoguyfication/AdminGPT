@@ -25,7 +25,7 @@ jobs:
       id: get_game_version
       run: |
         export GAME_VERSION=$(grep -r -oP '(?<=org\.spigotmc:spigot-api:)\d+\.\d+\.\d+' build.gradle | head -n1)
-        echo "GAME_VERSION=$GAME_VERSION" >> $GITHUB_ENV
+        echo "::set-output name=game_version::$GAME_VERSION"
 
     - name: Get Version Type
       id: get_version_type
@@ -38,7 +38,7 @@ jobs:
           VERSION_TYPE="release"
         fi
 
-        echo "VERSION_TYPE=$VERSION_TYPE" >> $GITHUB_ENV
+        echo "::set-output name=version_type::$VERSION_TYPE"
 
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
@@ -47,13 +47,10 @@ jobs:
       run: gradle shadowJar
 
     - uses: Kir-Antipov/mc-publish@v3.2
-      depends-on:
-        - get_game_version
-        - get_version_type
       with:
         game-versions:
-          - ${{ env.GAME_VERSION }}
-        version-type: ${{ env.VERSION_TYPE }}
+          - ${{ steps.get_game_version.outputs.game_version }}
+        version-type: ${{ steps.get_version_type.outputs.version_type }}
         loaders: |
           spigot
           bukkit
