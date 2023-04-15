@@ -25,13 +25,17 @@ dependencies {
 shadowJar {
     relocate "com.theokanning", "com.technoguyfication.admingpt"
     relocate "org.bstats", "com.technoguyfication.admingpt"
-}
 
-jar {
     manifest {
         attributes 'Main-Class': 'com.technoguyfication.admingpt.AdminGPT'
     }
 }
+
+// jar {
+//     manifest {
+//         attributes 'Main-Class': 'com.technoguyfication.admingpt.AdminGPT'
+//     }
+// }
 
 sourceSets {
     main {
